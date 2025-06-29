@@ -1,0 +1,271 @@
+/* ===========================================
+   CENTRALIZED PAGE STYLES
+   =========================================== */
+
+/* ===========================================
+   LAYOUT STYLES (AutomationLayout.vue)
+   =========================================== */
+
+/* Navigation item styles */
+.q-item.active {
+  border-radius: 8px;
+  margin: 0 8px;
+}
+
+.q-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  margin: 0 8px;
+}
+
+/* Dark mode hover effects */
+.body--dark .q-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Drawer styles */
+.q-drawer {
+  border-right: 1px solid #e0e0e0;
+}
+
+.body--dark .q-drawer {
+  border-right: 1px solid #424242;
+}
+
+/* Footer styles */
+.q-footer {
+  border-top: 1px solid #424242;
+}
+
+.body--dark .q-footer {
+  border-top: 1px solid #616161;
+}
+
+/* Smooth transitions for dark mode */
+.q-layout,
+.q-header,
+.q-drawer,
+.q-footer,
+.q-item,
+.q-toolbar {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ===========================================
+   CARD STYLES (Dashboard.vue, Reports.vue, User.vue)
+   =========================================== */
+
+/* Status and statistics cards */
+.status-card,
+.stat-card {
+  transition: transform 0.2s;
+}
+
+.status-card:hover,
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+/* ===========================================
+   TABLE STYLES
+   =========================================== */
+
+/* Table hover effects */
+.q-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.body--dark .q-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Enable word wrap for long text in table cells */
+.q-table td {
+  white-space: normal !important;
+  word-break: break-word;
+  max-width: 400px;
+}
+
+/* Optional: specifically target the command column if needed */
+.command-cell {
+  white-space: pre-line;
+  word-break: break-all;
+  max-width: 500px;
+}
+
+/* ===========================================
+   DIALOG STYLES
+   =========================================== */
+
+/* Dialog card styles */
+.q-dialog .q-card {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.body--dark .q-dialog .q-card {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ===========================================
+   BUTTON STYLES
+   =========================================== */
+
+/* Button group styles */
+.q-btn-group .q-btn {
+  margin-right: 2px;
+}
+
+.q-btn-group .q-btn:last-child {
+  margin-right: 0;
+}
+
+/* ===========================================
+   CHIP STYLES
+   =========================================== */
+
+/* Status chips */
+.q-chip {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* ===========================================
+   FORM STYLES
+   =========================================== */
+
+/* Form field spacing */
+.q-form .q-gutter-md > * {
+  margin-bottom: 16px;
+}
+
+/* ===========================================
+   RESPONSIVE STYLES
+   =========================================== */
+
+/* Mobile optimizations */
+@media (max-width: 599px) {
+  .q-table {
+    font-size: 0.875rem;
+  }
+  
+  .q-card {
+    margin: 8px;
+  }
+  
+  .q-dialog .q-card {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 600px) and (max-width: 1023px) {
+  .q-table {
+    font-size: 0.9rem;
+  }
+}
+
+/* ===========================================
+   UTILITY CLASSES
+   =========================================== */
+
+/* Text utilities */
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.text-truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Spacing utilities */
+.margin-auto {
+  margin: auto;
+}
+
+/* ===========================================
+   ANIMATION STYLES
+   =========================================== */
+
+/* Fade in animation */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide in animation */
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ===========================================
+   CUSTOM COMPONENT STYLES
+   =========================================== */
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.body--dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #424242;
+}
+
+.body--dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #616161;
+}
+
+.body--dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #757575;
+}
+
+/* Table cell center utility for status chips */
+.table-cell-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 7px 0 7px 0;
+} 
