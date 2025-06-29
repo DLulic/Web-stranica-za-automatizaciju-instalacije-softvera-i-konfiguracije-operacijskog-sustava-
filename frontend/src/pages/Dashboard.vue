@@ -105,6 +105,15 @@
                   @click="$router.push('/reports')"
                 />
               </div>
+              <div class="col-12 col-sm-6 col-md-3">
+                <q-btn 
+                  color="deep-purple" 
+                  icon="people" 
+                  label="User Management"
+                  class="full-width"
+                  @click="$router.push('/users')"
+                />
+              </div>
             </div>
           </q-card-section>
         </q-card>
@@ -129,13 +138,15 @@
               flat
             >
               <template v-slot:body-cell-status="props">
-                <q-chip
-                  :color="getStatusColor(props.value)"
-                  text-color="white"
-                  size="sm"
-                >
-                  {{ props.value }}
-                </q-chip>
+                <div class="table-cell-center">
+                  <q-chip
+                    :color="getStatusColor(props.value)"
+                    text-color="white"
+                    size="mh"
+                  >
+                    {{ props.value }}
+                  </q-chip>
+                </div>
               </template>
             </q-table>
           </q-card-section>
@@ -396,14 +407,4 @@ export default {
     }
   }
 };
-</script>
-
-<style scoped>
-.status-card {
-  transition: transform 0.2s;
-}
-
-.status-card:hover {
-  transform: translateY(-2px);
-}
-</style> 
+</script> 

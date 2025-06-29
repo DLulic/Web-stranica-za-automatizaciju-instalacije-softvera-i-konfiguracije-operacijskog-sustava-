@@ -28,42 +28,12 @@
 
     <!-- Statistics Cards -->
     <div class="row q-col-gutter-md q-mb-lg">
-      <div class="col-12 col-sm-6 col-md-3">
+      <div class="col-12">
         <q-card class="stat-card">
           <q-card-section class="text-center">
             <q-icon name="code" size="2rem" color="primary" />
             <div class="text-h6 q-mt-sm">{{ stats.totalDependencies }}</div>
             <div class="text-caption text-grey-6">Total Dependencies</div>
-          </q-card-section>
-        </q-card>
-      </div>
-      
-      <div class="col-12 col-sm-6 col-md-3">
-        <q-card class="stat-card">
-          <q-card-section class="text-center">
-            <q-icon name="check_circle" size="2rem" color="positive" />
-            <div class="text-h6 q-mt-sm">{{ stats.installedDependencies }}</div>
-            <div class="text-caption text-grey-6">Installed</div>
-          </q-card-section>
-        </q-card>
-      </div>
-      
-      <div class="col-12 col-sm-6 col-md-3">
-        <q-card class="stat-card">
-          <q-card-section class="text-center">
-            <q-icon name="pending" size="2rem" color="warning" />
-            <div class="text-h6 q-mt-sm">{{ stats.pendingDependencies }}</div>
-            <div class="text-caption text-grey-6">Pending</div>
-          </q-card-section>
-        </q-card>
-      </div>
-      
-      <div class="col-12 col-sm-6 col-md-3">
-        <q-card class="stat-card">
-          <q-card-section class="text-center">
-            <q-icon name="error" size="2rem" color="negative" />
-            <div class="text-h6 q-mt-sm">{{ stats.failedDependencies }}</div>
-            <div class="text-caption text-grey-6">Failed</div>
           </q-card-section>
         </q-card>
       </div>
@@ -84,19 +54,6 @@
           </template>
         </q-input>
       </div>
-      <div class="col-12 col-md-6">
-        <q-btn-toggle
-          v-model="statusFilter"
-          :options="[
-            { label: 'All', value: 'all' },
-            { label: 'Installed', value: 'installed' },
-            { label: 'Pending', value: 'pending' },
-            { label: 'Failed', value: 'failed' }
-          ]"
-          color="primary"
-          class="full-width"
-        />
-      </div>
     </div>
 
     <!-- Dependencies Table -->
@@ -112,56 +69,54 @@
           @request="onRequest"
           flat
         >
-          <template v-slot:body-cell-status="props">
-            <q-chip
-              :color="getStatusColor(props.value)"
-              text-color="white"
-              size="sm"
-            >
-              {{ props.value }}
-            </q-chip>
-          </template>
-          
-          <template v-slot:body-cell-actions="props">
-            <q-btn-group flat>
-              <q-btn
-                flat
-                round
-                color="primary"
-                icon="download"
-                @click="installDependency(props.row)"
-                :loading="props.row.installing"
+          <template v-slot:body-cell="props">
+            <q-td :props="props">
+              <!-- Status column -->
+              <q-chip
+                v-if="props.col.name === 'status'"
+                :color="getStatusColor(props.value)"
+                text-color="white"
+                size="sm"
               >
-                <q-tooltip>Install</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="secondary"
-                icon="edit"
-                @click="editDependency(props.row)"
-              >
-                <q-tooltip>Edit</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="info"
-                icon="info"
-                @click="showDependencyDetails(props.row)"
-              >
-                <q-tooltip>Details</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="negative"
-                icon="delete"
-                @click="deleteDependency(props.row)"
-              >
-                <q-tooltip>Delete</q-tooltip>
-              </q-btn>
-            </q-btn-group>
+                {{ props.value }}
+              </q-chip>
+
+              <!-- Actions column -->
+              <q-btn-group v-else-if="props.col.name === 'actions'" flat>
+                <q-btn
+                  flat
+                  round
+                  color="secondary"
+                  icon="edit"
+                  @click="editDependency(props.row)"
+                >
+                  <q-tooltip>Edit</q-tooltip>
+                </q-btn>
+                <q-btn
+                  flat
+                  round
+                  color="info"
+                  icon="info"
+                  @click="showDependencyDetails(props.row)"
+                >
+                  <q-tooltip>Details</q-tooltip>
+                </q-btn>
+                <q-btn
+                  flat
+                  round
+                  color="negative"
+                  icon="delete"
+                  @click="deleteDependency(props.row)"
+                >
+                  <q-tooltip>Delete</q-tooltip>
+                </q-btn>
+              </q-btn-group>
+
+              <!-- Default: just show the value -->
+              <span v-else>
+                {{ props.value }}
+              </span>
+            </q-td>
           </template>
         </q-table>
       </q-card-section>
@@ -213,33 +168,24 @@
         <q-card-section v-if="selectedDependency">
           <div class="q-gutter-y-md">
             <div>
-              <strong>Dependency Name:</strong> {{ selectedDependency.python_name }}
+              <strong>Dependency Name:</strong>
+              <q-input
+                class="q-mt-sm"
+                outlined
+                readonly
+                dense
+                :model-value="selectedDependency.python_name"
+              />
             </div>
             <div>
-              <strong>Description:</strong> {{ selectedDependency.python_desc }}
-            </div>
-            <div>
-              <strong>Status:</strong>
-              <q-chip
-                :color="getStatusColor(selectedDependency.status || 'pending')"
-                text-color="white"
-                size="sm"
-                class="q-ml-sm"
-              >
-                {{ selectedDependency.status || 'pending' }}
-              </q-chip>
-            </div>
-            <div v-if="selectedDependency.version">
-              <strong>Version:</strong> {{ selectedDependency.version }}
-            </div>
-            <div v-if="selectedDependency.installDate">
-              <strong>Install Date:</strong> {{ formatDate(selectedDependency.installDate) }}
-            </div>
-            <div v-if="selectedDependency.dependencies">
-              <strong>Dependencies:</strong>
-              <div class="q-mt-sm q-pa-sm bg-grey-2 rounded">
-                {{ selectedDependency.dependencies }}
-              </div>
+              <strong>Description:</strong> {{  }}
+              <q-input
+                class="q-mt-sm"
+                outlined
+                readonly
+                dense
+                :model-value="selectedDependency.python_desc"
+                />
             </div>
           </div>
         </q-card-section>
@@ -264,43 +210,6 @@
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" @click="showDeleteDialog = false" />
           <q-btn unelevated label="Delete" color="negative" @click="confirmDelete" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-
-    <!-- Batch Install Dialog -->
-    <q-dialog v-model="showBatchDialog">
-      <q-card style="min-width: 600px">
-        <q-card-section>
-          <div class="text-h6">Batch Install Dependencies</div>
-        </q-card-section>
-
-        <q-card-section>
-          <div class="q-gutter-y-md">
-            <div class="text-subtitle2">Select dependencies to install:</div>
-            <q-list>
-              <q-item v-for="dependency in dependencies" :key="dependency.python_id">
-                <q-item-section avatar>
-                  <q-checkbox v-model="selectedDependencies" :val="dependency.python_id" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ dependency.python_name }}</q-item-label>
-                  <q-item-label caption>{{ dependency.python_desc }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </q-list>
-          </div>
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" @click="showBatchDialog = false" />
-          <q-btn 
-            unelevated 
-            label="Install Selected" 
-            color="primary" 
-            @click="batchInstall"
-            :loading="batchInstalling"
-          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -363,18 +272,6 @@ export default {
           label: 'Description',
           field: 'python_desc',
           align: 'left'
-        },
-        {
-          name: 'status',
-          label: 'Status',
-          field: 'status',
-          align: 'center'
-        },
-        {
-          name: 'version',
-          label: 'Version',
-          field: 'version',
-          align: 'center'
         },
         {
           name: 'actions',
@@ -528,53 +425,10 @@ export default {
 
     calculateStats() {
       const total = this.dependencies.length;
-      const installed = this.dependencies.filter(p => p.status === 'installed').length;
-      const pending = this.dependencies.filter(p => p.status === 'pending').length;
-      const failed = this.dependencies.filter(p => p.status === 'failed').length;
       
       this.stats = {
         totalDependencies: total,
-        installedDependencies: installed,
-        pendingDependencies: pending,
-        failedDependencies: failed
       };
-    },
-
-    async installDependency(dependency) {
-      dependency.installing = true;
-      try {
-        const response = await axios.post(`python-packages/${dependency.python_id}/install`, {
-          computerName: 'DESKTOP-ABC123' // You can make this dynamic
-        }, {
-          headers: this.headers,
-        });
-        const result = response.data;
-        
-        // Update status based on API response
-        dependency.status = 'installed';
-        dependency.installDate = new Date();
-        dependency.version = '1.0.0'; // You might want to get this from the API response
-        
-        this.calculateStats();
-        
-        this.$q.notify({
-          color: "positive",
-          position: "top",
-          message: result.message || `Dependency "${dependency.python_name}" installed successfully`,
-          icon: "check",
-        });
-      } catch (error) {
-        console.error('Error installing dependency:', error);
-        dependency.status = 'failed';
-        this.$q.notify({
-          color: "negative",
-          position: "top",
-          message: "Greška pri instalaciji ovisnosti",
-          icon: "report_problem",
-        });
-      } finally {
-        dependency.installing = false;
-      }
     },
 
     editDependency(dependency) {
@@ -662,55 +516,6 @@ export default {
       }
     },
 
-    async batchInstall() {
-      if (this.selectedDependencies.length === 0) {
-        this.$q.notify({
-          color: "warning",
-          position: "top",
-          message: "Molimo odaberite ovisnosti za instalaciju",
-          icon: "warning",
-        });
-        return;
-      }
-
-      this.batchInstalling = true;
-      try {
-        // Mock batch installation
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        
-        // Update selected dependencies
-        this.selectedDependencies.forEach(dependencyId => {
-          const dependency = this.dependencies.find(p => p.python_id === dependencyId);
-          if (dependency) {
-            dependency.status = 'installed';
-            dependency.installDate = new Date();
-            dependency.version = '1.0.0';
-          }
-        });
-        
-        this.calculateStats();
-        this.selectedDependencies = [];
-        this.showBatchDialog = false;
-        
-        this.$q.notify({
-          color: "positive",
-          position: "top",
-          message: "Batch instalacija uspješno završena",
-          icon: "check",
-        });
-      } catch (error) {
-        console.error('Error in batch installation:', error);
-        this.$q.notify({
-          color: "negative",
-          position: "top",
-          message: "Batch instalacija neuspješna",
-          icon: "report_problem",
-        });
-      } finally {
-        this.batchInstalling = false;
-      }
-    },
-
     closeDialog() {
       this.showAddDialog = false;
       this.editingDependency = null;
@@ -721,14 +526,4 @@ export default {
     }
   }
 };
-</script>
-
-<style scoped>
-.stat-card {
-  transition: transform 0.2s;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-}
-</style> 
+</script> 

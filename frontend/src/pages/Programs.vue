@@ -70,63 +70,63 @@
           @request="onRequest"
           flat
         >
-          <template v-slot:body-cell-category="props">
-            <q-chip
-              :color="getCategoryColor(props.value)"
-              text-color="white"
-              size="sm"
-            >
-              {{ props.value }}
-            </q-chip>
-          </template>
-          
-          <template v-slot:body-cell-enabled="props">
-            <q-toggle
-              v-model="props.row.program_enabled"
-              @update:model-value="toggleProgram(props.row)"
-            />
-          </template>
-          
-          <template v-slot:body-cell-actions="props">
-            <q-btn-group flat>
-              <q-btn
-                flat
-                round
+          <template v-slot:body-cell="props">
+            <q-td :props="props">
+              <!-- Category column -->
+              <q-chip
+                v-if="props.col.name === 'category'"
+                :color="getCategoryColor(props.value)"
+                text-color="white"
+                size="mh"
+              >
+                {{ props.value }}
+              </q-chip>
+
+              <!-- Enabled column -->
+              <q-toggle
+                v-else-if="props.col.name === 'enabled'"
+                v-model="props.row.program_enabled"
+                @update:model-value="toggleProgram(props.row)"
                 color="primary"
-                icon="download"
-                @click="installProgram(props.row)"
-                :loading="props.row.installing"
-              >
-                <q-tooltip>Install</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="secondary"
-                icon="edit"
-                @click="editProgram(props.row)"
-              >
-                <q-tooltip>Edit</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="info"
-                icon="info"
-                @click="showProgramDetails(props.row)"
-              >
-                <q-tooltip>Details</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="negative"
-                icon="delete"
-                @click="deleteProgram(props.row)"
-              >
-                <q-tooltip>Delete</q-tooltip>
-              </q-btn>
-            </q-btn-group>
+                size="mh"
+              />
+
+              <!-- Actions column -->
+              <q-btn-group v-else-if="props.col.name === 'actions'" flat>
+                <q-btn
+                  flat
+                  round
+                  color="secondary"
+                  icon="edit"
+                  @click="editProgram(props.row)"
+                >
+                  <q-tooltip>Edit</q-tooltip>
+                </q-btn>
+                <q-btn
+                  flat
+                  round
+                  color="info"
+                  icon="info"
+                  @click="showProgramDetails(props.row)"
+                >
+                  <q-tooltip>Details</q-tooltip>
+                </q-btn>
+                <q-btn
+                  flat
+                  round
+                  color="negative"
+                  icon="delete"
+                  @click="deleteProgram(props.row)"
+                >
+                  <q-tooltip>Delete</q-tooltip>
+                </q-btn>
+              </q-btn-group>
+
+              <!-- Default: just show the value -->
+              <span v-else>
+                {{ props.value }}
+              </span>
+            </q-td>
           </template>
         </q-table>
       </q-card-section>
@@ -197,18 +197,28 @@
 
         <q-card-section v-if="selectedProgram">
           <div class="q-gutter-y-md">
-            <div>
-              <strong>Name:</strong> {{ selectedProgram.program_name }}
-            </div>
+            <q-input
+              class="q-mt-sm"
+              outlined
+              readonly
+              dense
+              :model-value="selectedProgram.program_name"
+            />
             <div v-if="selectedProgram.program_desc">
-              <strong>Description:</strong> {{ selectedProgram.program_desc }}
+              <strong>Description:</strong> <q-input
+                class="q-mt-sm"
+                outlined
+                readonly
+                dense
+                :model-value="selectedProgram.program_desc"
+              />
             </div>
             <div>
               <strong>Category:</strong>
               <q-chip
                 :color="getCategoryColor(selectedProgram.program_category)"
                 text-color="white"
-                size="sm"
+                size="mh"
                 class="q-ml-sm"
               >
                 {{ selectedProgram.program_category }}
@@ -216,16 +226,20 @@
             </div>
             <div>
               <strong>Package:</strong>
-              <div class="q-mt-sm q-pa-sm bg-grey-2 rounded">
-                {{ selectedProgram.program_package }}
-              </div>
+              <q-input
+                class="q-mt-sm"
+                outlined
+                readonly
+                dense
+                :model-value="selectedProgram.program_package"
+              />
             </div>
             <div>
               <strong>Status:</strong>
               <q-chip
                 :color="selectedProgram.program_enabled ? 'positive' : 'negative'"
                 text-color="white"
-                size="sm"
+                size="mh"
                 class="q-ml-sm"
               >
                 {{ selectedProgram.program_enabled ? 'Enabled' : 'Disabled' }}

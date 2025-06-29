@@ -70,73 +70,63 @@
           @request="onRequest"
           flat
         >
-          <template v-slot:body-cell-type="props">
-            <q-chip
-              :color="getTypeColor(props.value)"
-              text-color="white"
-              size="sm"
-            >
-              {{ props.value }}
-            </q-chip>
-          </template>
-          
-          <template v-slot:body-cell-enabled="props">
-            <q-toggle
-              v-model="props.row.policies_enable"
-              @update:model-value="togglePolicy(props.row)"
-            />
-          </template>
-          
-          <template v-slot:body-cell-actions="props">
-            <q-btn-group flat>
-              <q-btn
-                flat
-                round
+          <template v-slot:body-cell="props">
+            <q-td :props="props">
+              <!-- Type column -->
+              <q-chip
+                v-if="props.col.name === 'type'"
+                :color="getTypeColor(props.value)"
+                text-color="white"
+                size="mh"
+              >
+                {{ props.value }}
+              </q-chip>
+
+              <!-- Enabled column -->
+              <q-toggle
+                v-else-if="props.col.name === 'enabled'"
+                v-model="props.row.policies_enable"
+                @update:model-value="togglePolicy(props.row)"
                 color="primary"
-                icon="play_arrow"
-                @click="applyPolicy(props.row)"
-                :loading="props.row.applying"
-              >
-                <q-tooltip>Apply Policy</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="warning"
-                icon="undo"
-                @click="revertPolicy(props.row)"
-                :loading="props.row.reverting"
-              >
-                <q-tooltip>Revert Policy</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="secondary"
-                icon="edit"
-                @click="editPolicy(props.row)"
-              >
-                <q-tooltip>Edit</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="info"
-                icon="info"
-                @click="showPolicyDetails(props.row)"
-              >
-                <q-tooltip>Details</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="negative"
-                icon="delete"
-                @click="deletePolicy(props.row)"
-              >
-                <q-tooltip>Delete</q-tooltip>
-              </q-btn>
-            </q-btn-group>
+                size="mh"
+              />
+
+              <!-- Actions column -->
+              <q-btn-group v-else-if="props.col.name === 'actions'" flat>
+                <q-btn
+                  flat
+                  round
+                  color="secondary"
+                  icon="edit"
+                  @click="editPolicy(props.row)"
+                >
+                  <q-tooltip>Edit</q-tooltip>
+                </q-btn>
+                <q-btn
+                  flat
+                  round
+                  color="info"
+                  icon="info"
+                  @click="showPolicyDetails(props.row)"
+                >
+                  <q-tooltip>Details</q-tooltip>
+                </q-btn>
+                <q-btn
+                  flat
+                  round
+                  color="negative"
+                  icon="delete"
+                  @click="deletePolicy(props.row)"
+                >
+                  <q-tooltip>Delete</q-tooltip>
+                </q-btn>
+              </q-btn-group>
+
+              <!-- Default: just show the value -->
+              <span v-else>
+                {{ props.value }}
+              </span>
+            </q-td>
           </template>
         </q-table>
       </q-card-section>
@@ -150,61 +140,62 @@
         </q-card-section>
 
         <q-card-section>
-          <q-form @submit="savePolicy" class="q-gutter-md">
-            <q-input
-              v-model="policyForm.policies_name"
-              label="Policy Name"
-              outlined
-              :rules="[val => !!val || 'Name is required']"
-            />
-            
-            <q-input
-              v-model="policyForm.policies_regName"
-              label="Registry Name"
-              outlined
-              :rules="[val => !!val || 'Registry name is required']"
-            />
-            
-            <q-input
-              v-model="policyForm.policies_regPath"
-              label="Registry Path"
-              outlined
-              :rules="[val => !!val || 'Registry path is required']"
-              hint="Example: HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search"
-            />
-            
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-6">
-                <q-input
-                  v-model="policyForm.policies_regVaule"
-                  label="Registry Value"
-                  outlined
-                  :rules="[val => !!val || 'Registry value is required']"
-                />
+          <div class="q-gutter-y-md">
+            <q-form @submit="savePolicy">
+              <q-input
+                v-model="policyForm.policies_name"
+                label="Policy Name"
+                outlined
+                :rules="[val => !!val || 'Name is required']"
+              />
+              
+              <q-input
+                v-model="policyForm.policies_regName"
+                label="Registry Name"
+                outlined
+                :rules="[val => !!val || 'Registry name is required']"
+              />
+              
+              <q-input
+                v-model="policyForm.policies_regPath"
+                label="Registry Path"
+                outlined
+                :rules="[val => !!val || 'Registry path is required']"
+              />
+              
+              <div class="row q-col-gutter-md">
+                <div class="col-12 col-md-6">
+                  <q-input
+                    v-model="policyForm.policies_regVaule"
+                    label="Registry Value"
+                    outlined
+                    :rules="[val => !!val || 'Registry value is required']"
+                  />
+                </div>
+                <div class="col-12 col-md-6">
+                  <q-input
+                    v-model="policyForm.policies_regVauleRevert"
+                    label="Revert Value"
+                    outlined
+                    :rules="[val => !!val || 'Revert value is required']"
+                  />
+                </div>
               </div>
-              <div class="col-12 col-md-6">
-                <q-input
-                  v-model="policyForm.policies_regVauleRevert"
-                  label="Revert Value"
-                  outlined
-                  :rules="[val => !!val || 'Revert value is required']"
-                />
-              </div>
-            </div>
-            
-            <q-select
-              v-model="policyForm.policies_type"
-              :options="typeOptions"
-              label="Registry Type"
-              outlined
-              :rules="[val => !!val || 'Type is required']"
-            />
-            
-            <q-toggle
-              v-model="policyForm.policies_enable"
-              label="Enabled"
-            />
-          </q-form>
+              
+              <q-select
+                v-model="policyForm.policies_type"
+                :options="typeOptions"
+                label="Registry Type"
+                outlined
+                :rules="[val => !!val || 'Type is required']"
+              />
+              
+              <q-toggle
+                v-model="policyForm.policies_enable"
+                label="Enabled"
+              />
+            </q-form>
+          </div>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -224,29 +215,55 @@
         <q-card-section v-if="selectedPolicy">
           <div class="q-gutter-y-md">
             <div>
-              <strong>Name:</strong> {{ selectedPolicy.policies_name }}
+              <strong>Name:</strong> <q-input
+                class="q-mt-sm"
+                outlined
+                readonly
+                dense
+                :model-value="selectedPolicy.policies_name"
+              />
             </div>
             <div>
-              <strong>Registry Name:</strong> {{ selectedPolicy.policies_regName }}
+              <strong>Registry Name:</strong>
+              <q-input
+                class="q-mt-sm"
+                outlined
+                readonly
+                dense
+                :model-value="selectedPolicy.policies_regName"
+              />
             </div>
             <div>
               <strong>Registry Path:</strong>
-              <div class="q-mt-sm q-pa-sm bg-grey-2 rounded">
-                {{ selectedPolicy.policies_regPath }}
-              </div>
+              <q-input
+                class="q-mt-sm"
+                outlined
+                readonly
+                dense
+                :model-value="selectedPolicy.policies_regPath"
+              />
             </div>
+            
             <div class="row q-col-gutter-md">
               <div class="col-12 col-md-6">
                 <strong>Registry Value:</strong>
-                <div class="q-mt-sm q-pa-sm bg-blue-1 rounded">
-                  {{ selectedPolicy.policies_regVaule }}
-                </div>
+                <q-input
+                  class="q-mt-sm"
+                  outlined
+                  readonly
+                  dense
+                  :model-value="selectedPolicy.policies_regVaule"
+                />
               </div>
               <div class="col-12 col-md-6">
                 <strong>Revert Value:</strong>
-                <div class="q-mt-sm q-pa-sm bg-orange-1 rounded">
-                  {{ selectedPolicy.policies_regVauleRevert }}
-                </div>
+                <q-input
+                  class="q-mt-sm"
+                  outlined
+                  readonly
+                  dense
+                  :model-value="selectedPolicy.policies_regVauleRevert"
+                />
               </div>
             </div>
             <div>
@@ -254,7 +271,7 @@
               <q-chip
                 :color="getTypeColor(selectedPolicy.policies_type)"
                 text-color="white"
-                size="sm"
+                size="mh"
                 class="q-ml-sm"
               >
                 {{ selectedPolicy.policies_type }}
@@ -265,7 +282,7 @@
               <q-chip
                 :color="selectedPolicy.policies_enable ? 'positive' : 'negative'"
                 text-color="white"
-                size="sm"
+                size="mh"
                 class="q-ml-sm"
               >
                 {{ selectedPolicy.policies_enable ? 'Enabled' : 'Disabled' }}
@@ -386,7 +403,7 @@ export default {
         {
           name: 'actions',
           label: 'Actions',
-          align: 'center'
+          align: 'center',
         }
       ]
     };

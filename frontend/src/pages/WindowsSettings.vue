@@ -60,44 +60,44 @@
           @request="onRequest"
           flat
         >
-          <template v-slot:body-cell-enabled="props">
-            <q-toggle
-              v-model="props.row.settings_enable"
-              @update:model-value="toggleSetting(props.row)"
-            />
-          </template>
-          
-          <template v-slot:body-cell-actions="props">
-            <q-btn-group flat>
-              <q-btn
-                flat
-                round
+          <template v-slot:body-cell="props">
+            <q-td :props="props">
+              <!-- Enabled column -->
+              <q-toggle
+                v-if="props.col.name === 'enabled'"
+                v-model="props.row.settings_enable"
+                @update:model-value="toggleSetting(props.row)"
                 color="primary"
-                icon="play_arrow"
-                @click="executeSetting(props.row)"
-                :loading="props.row.executing"
-              >
-                <q-tooltip>Execute</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="secondary"
-                icon="edit"
-                @click="editSetting(props.row)"
-              >
-                <q-tooltip>Edit</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="negative"
-                icon="delete"
-                @click="deleteSetting(props.row)"
-              >
-                <q-tooltip>Delete</q-tooltip>
-              </q-btn>
-            </q-btn-group>
+                size="sm"
+              />
+
+              <!-- Actions column -->
+              <q-btn-group v-else-if="props.col.name === 'actions'" flat>
+                <q-btn
+                  flat
+                  round
+                  color="secondary"
+                  icon="edit"
+                  @click="editSetting(props.row)"
+                >
+                  <q-tooltip>Edit</q-tooltip>
+                </q-btn>
+                <q-btn
+                  flat
+                  round
+                  color="negative"
+                  icon="delete"
+                  @click="deleteSetting(props.row)"
+                >
+                  <q-tooltip>Delete</q-tooltip>
+                </q-btn>
+              </q-btn-group>
+
+              <!-- Default: just show the value -->
+              <span v-else>
+                {{ props.value }}
+              </span>
+            </q-td>
           </template>
         </q-table>
       </q-card-section>
@@ -214,11 +214,14 @@ export default {
           name: 'enabled',
           label: 'Enabled',
           field: 'settings_enable',
-          align: 'center'
+          align: 'center',
+          format: (val) => this.getEnabledStatus(val),
+          style: (row) => `color: ${this.getEnabledColor(row.settings_enable) === 'positive' ? 'green' : 'red'}`
         },
         {
           name: 'actions',
           label: 'Actions',
+          field: 'actions',
           align: 'center'
         }
       ]
@@ -283,6 +286,14 @@ export default {
   },
 
   methods: {
+    getEnabledStatus(enabled) {
+      return enabled ? 'Yes' : 'No';
+    },
+
+    getEnabledColor(enabled) {
+      return enabled ? 'positive' : 'negative';
+    },
+
     async loadSettings() {
       const limit = this.pagination.rowsPerPage === 0 ? this.pagination.rowsNumber : this.pagination.rowsPerPage;
 

@@ -12,7 +12,7 @@
             <q-btn
               color="secondary"
               icon="download"
-              label="Export CSV"
+              label="Export PDF"
               @click="exportReports"
             />
             <q-btn
@@ -109,23 +109,6 @@
       
       <div class="col-12 col-md-3">
         <q-input
-          v-model="computerFilter"
-          placeholder="Filter by computer..."
-          outlined
-          dense
-          clearable
-        >
-          <template v-slot:prepend>
-            <q-icon name="computer" />
-          </template>
-        </q-input>
-      </div>
-    </div>
-
-    <!-- Date Range Filter -->
-    <div class="row q-col-gutter-md q-mb-md">
-      <div class="col-12 col-md-4">
-        <q-input
           v-model="dateFrom"
           label="From Date"
           outlined
@@ -134,7 +117,7 @@
           clearable
         />
       </div>
-      <div class="col-12 col-md-4">
+      <div class="col-12 col-md-3">
         <q-input
           v-model="dateTo"
           label="To Date"
@@ -142,15 +125,6 @@
           dense
           type="date"
           clearable
-        />
-      </div>
-      <div class="col-12 col-md-4">
-        <q-btn
-          color="primary"
-          icon="filter_list"
-          label="Apply Filters"
-          class="full-width"
-          @click="applyFilters"
         />
       </div>
     </div>
@@ -168,59 +142,59 @@
           @request="onRequest"
           flat
         >
-          <template v-slot:body-cell-status="props">
-            <q-chip
-              :color="getStatusColor(props.value)"
-              text-color="white"
-              size="sm"
-            >
-              {{ props.value }}
-            </q-chip>
-          </template>
-          
-          <template v-slot:body-cell-task_type="props">
-            <q-chip
-              :color="getTaskTypeColor(props.value)"
-              text-color="white"
-              size="sm"
-            >
-              {{ props.value }}
-            </q-chip>
-          </template>
-          
-          <template v-slot:body-cell-timestamp="props">
-            {{ formatDate(props.value) }}
-          </template>
-          
-          <template v-slot:body-cell-actions="props">
-            <q-btn-group flat>
-              <q-btn
-                flat
-                round
-                color="info"
-                icon="info"
-                @click="showReportDetails(props.row)"
+          <template v-slot:body-cell="props">
+            <q-td :props="props">
+              <!-- Status column -->
+              <q-chip
+                v-if="props.col.name === 'status'"
+                :color="getStatusColor(props.value)"
+                text-color="white"
+                size="mh"
               >
-                <q-tooltip>Details</q-tooltip>
-              </q-btn>
-              <q-btn
-                flat
-                round
-                color="secondary"
-                icon="download"
-                @click="downloadReport(props.row)"
+                {{ statusLabel ? statusLabel(props.value) : props.value }}
+              </q-chip>
+
+              <!-- Task Type column -->
+              <q-chip
+                v-else-if="props.col.name === 'task_type'"
+                :color="getTaskTypeColor(props.value)"
+                text-color="white"
+                size="mh"
               >
-                <q-tooltip>Download</q-tooltip>
-              </q-btn>
-            </q-btn-group>
+                {{ props.value }}
+              </q-chip>
+
+              <!-- Timestamp column -->
+              <span v-else-if="props.col.name === 'timestamp'">
+                {{ formatDate(props.value) }}
+              </span>
+
+              <!-- Actions column -->
+              <q-btn-group v-else-if="props.col.name === 'actions'" flat>
+                <q-btn
+                  flat
+                  round
+                  color="info"
+                  icon="info"
+                  @click="showReportDetails(props.row)"
+                >
+                  <q-tooltip>Details</q-tooltip>
+                </q-btn>
+              </q-btn-group>
+
+              <!-- Default: just show the value -->
+              <span v-else>
+                {{ props.value }}
+              </span>
+            </q-td>
           </template>
         </q-table>
       </q-card-section>
     </q-card>
 
     <!-- Report Details Dialog -->
-    <q-dialog v-model="showDetailsDialog" maximized>
-      <q-card>
+    <q-dialog v-model="showDetailsDialog">
+      <q-card style="min-width: 500px">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">Report Details</div>
           <q-space />
@@ -229,73 +203,71 @@
 
         <q-card-section v-if="selectedReport">
           <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <q-card flat bordered>
-                <q-card-section>
-                  <div class="text-h6">Basic Information</div>
-                </q-card-section>
+            <div class="col-12">
+              <q-card flat>
                 <q-card-section>
                   <div class="q-gutter-y-md">
                     <div>
-                      <strong>Report ID:</strong> {{ selectedReport.report_id }}
+                      <strong>Report ID:</strong> 
+                      <q-input
+                        class="q-mt-sm"
+                        outlined
+                        readonly
+                        dense
+                        :model-value="selectedReport.report_id"
+                      />
                     </div>
                     <div>
-                      <strong>Computer Name:</strong> {{ selectedReport.report_computer_name }}
+                      <strong>Computer Name:</strong>
+                      <q-input
+                        class="q-mt-sm"
+                        outlined
+                        readonly
+                        dense
+                        :model-value="selectedReport.report_computer_name"
+                      />
                     </div>
                     <div>
                       <strong>Task Type:</strong>
                       <q-chip
                         :color="getTaskTypeColor(selectedReport.report_task_type)"
                         text-color="white"
-                        size="sm"
+                        size="mh"
                         class="q-ml-sm"
                       >
                         {{ selectedReport.report_task_type }}
                       </q-chip>
                     </div>
                     <div>
-                      <strong>Task Name:</strong> {{ selectedReport.report_task_name }}
+                      <strong>Task Name:</strong>
+                      <q-input
+                        class="q-mt-sm"
+                        outlined
+                        readonly
+                        dense
+                        :model-value="selectedReport.report_task_name"
+                      />
                     </div>
                     <div>
                       <strong>Status:</strong>
                       <q-chip
                         :color="getStatusColor(selectedReport.report_status)"
                         text-color="white"
-                        size="sm"
+                        size="mh"
                         class="q-ml-sm"
                       >
                         {{ selectedReport.report_status }}
                       </q-chip>
                     </div>
                     <div>
-                      <strong>Timestamp:</strong> {{ formatDate(selectedReport.report_timestamp) }}
-                    </div>
-                  </div>
-                </q-card-section>
-              </q-card>
-            </div>
-            
-            <div class="col-12 col-md-6">
-              <q-card flat bordered>
-                <q-card-section>
-                  <div class="text-h6">Execution Details</div>
-                </q-card-section>
-                <q-card-section>
-                  <div class="q-gutter-y-md">
-                    <div>
-                      <strong>Execution Time:</strong> {{ selectedReport.executionTime || 'N/A' }}
-                    </div>
-                    <div>
-                      <strong>Memory Usage:</strong> {{ selectedReport.memoryUsage || 'N/A' }}
-                    </div>
-                    <div>
-                      <strong>CPU Usage:</strong> {{ selectedReport.cpuUsage || 'N/A' }}
-                    </div>
-                    <div v-if="selectedReport.errorMessage">
-                      <strong>Error Message:</strong>
-                      <div class="q-mt-sm q-pa-sm bg-red-1 text-red-8 rounded">
-                        {{ selectedReport.errorMessage }}
-                      </div>
+                      <strong>Timestamp:</strong>
+                      <q-input
+                        class="q-mt-sm"
+                        outlined
+                        readonly
+                        dense
+                        :model-value="formatDate(selectedReport.report_timestamp)"
+                      />
                     </div>
                   </div>
                 </q-card-section>
@@ -313,6 +285,8 @@ import axios from "../router/axios";
 import { jwtDecode } from 'jwt-decode';
 import { Quasar } from 'quasar';
 import hr from 'quasar/lang/hr';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 Quasar.lang.set(hr);
 
@@ -324,7 +298,6 @@ export default {
       searchTerm: '',
       statusFilter: null,
       taskTypeFilter: null,
-      computerFilter: '',
       dateFrom: '',
       dateTo: '',
       showDetailsDialog: false,
@@ -373,16 +346,16 @@ export default {
           sortable: true
         },
         {
-          name: 'task_type',
-          label: 'Task Type',
-          field: 'report_task_type',
-          align: 'center'
-        },
-        {
           name: 'task_name',
           label: 'Task Name',
           field: 'report_task_name',
           align: 'left'
+        },
+        {
+          name: 'task_type',
+          label: 'Task Type',
+          field: 'report_task_type',
+          align: 'center'
         },
         {
           name: 'status',
@@ -432,19 +405,12 @@ export default {
 
       // Filter by status
       if (this.statusFilter) {
-        filtered = filtered.filter(report => report.report_status === this.statusFilter);
+        filtered = filtered.filter(report => report.report_status === this.statusFilter.value);
       }
 
       // Filter by task type
       if (this.taskTypeFilter) {
-        filtered = filtered.filter(report => report.report_task_type === this.taskTypeFilter);
-      }
-
-      // Filter by computer
-      if (this.computerFilter) {
-        filtered = filtered.filter(report =>
-          report.report_computer_name.toLowerCase().includes(this.computerFilter.toLowerCase())
-        );
+        filtered = filtered.filter(report => report.report_task_type === this.taskTypeFilter.value);
       }
 
       // Filter by date range
@@ -636,34 +602,35 @@ export default {
     },
 
     exportReports() {
-      // Mock export functionality
+      const doc = new jsPDF();
+      const columns = [
+        { header: 'ID', dataKey: 'report_id' },
+        { header: 'Computer', dataKey: 'report_computer_name' },
+        { header: 'Task Type', dataKey: 'report_task_type' },
+        { header: 'Task Name', dataKey: 'report_task_name' },
+        { header: 'Status', dataKey: 'report_status' },
+        { header: 'Timestamp', dataKey: 'report_timestamp' }
+      ];
+      const rows = this.filteredReports.map(report => ({
+        report_id: report.report_id,
+        report_computer_name: report.report_computer_name,
+        report_task_type: report.report_task_type,
+        report_task_name: report.report_task_name,
+        report_status: report.report_status,
+        report_timestamp: this.formatDate(report.report_timestamp)
+      }));
+      autoTable(doc, {
+        columns,
+        body: rows,
+        styles: { fontSize: 9 }
+      });
+      doc.save('reports.pdf');
       this.$q.notify({
-        color: "positive",
-        position: "top",
-        message: "Izvoz izvještaja u CSV",
-        icon: "download",
+        color: 'positive',
+        message: 'PDF exported!',
+        icon: 'check'
       });
     },
-
-    applyFilters() {
-      // Filters are applied automatically through computed property
-      this.$q.notify({
-        color: "info",
-        position: "top",
-        message: "Filtri primijenjeni",
-        icon: "filter_list",
-      });
-    }
   }
 };
-</script>
-
-<style scoped>
-.stat-card {
-  transition: transform 0.2s;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-}
-</style> 
+</script> 
