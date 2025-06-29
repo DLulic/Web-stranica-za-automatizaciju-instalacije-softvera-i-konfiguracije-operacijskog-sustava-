@@ -437,6 +437,133 @@ app.get("/api/system/status", authJwt.verifyToken("Admin"), async (req, res) => 
   }
 });
 
+// User Management API
+app.get("/api/users", authJwt.verifyToken("Admin"), async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const users = await User.findAll({
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      attributes: ['user_id', 'email', 'role'], // Don't include password or refresh_token
+      order: [['user_id', 'DESC']] // Order by user_id since no timestamps
+    });
+
+    const totalUsers = await User.count();
+
+    res.status(200).json({
+      users: users,
+      total: totalUsers,
+      page: page,
+      limit: limit
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: true, message: "Failed to fetch users" });
+  }
+});
+
+app.get("/api/users/statistics", authJwt.verifyToken("Admin"), async (req, res) => {
+  try {
+    const totalUsers = await User.count();
+    const adminUsers = await User.count({ where: { role: 'Admin' } });
+    
+    res.status(200).json({
+      totalUsers,
+      adminUsers
+    });
+  } catch (error) {
+    console.error("Error fetching user statistics:", error);
+    res.status(500).json({ error: true, message: "Failed to fetch user statistics" });
+  }
+});
+
+app.get("/api/users/:id", authJwt.verifyToken("Admin"), async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id, {
+      attributes: ['user_id', 'email', 'role'] // Don't include password or refresh_token
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: true, message: "User not found" });
+    }
+    
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: true, message: "Failed to fetch user" });
+  }
+});
+
+app.put("/api/users/:id", authJwt.verifyToken("Admin"), async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: true, message: "User not found" });
+    }
+
+    const { email, password, role } = req.body;
+
+    // Check if email is being changed and if it already exists
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(409).json({
+          error: true,
+          message: "Email već postoji.",
+        });
+      }
+    }
+
+    const updateData = {};
+    if (email) updateData.email = email;
+    if (role) updateData.role = role;
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    await user.update(updateData);
+    
+    // Return user without password
+    const updatedUser = await User.findByPk(req.params.id, {
+      attributes: ['user_id', 'email', 'role']
+    });
+    
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: true, message: "Failed to update user" });
+  }
+});
+
+app.delete("/api/users/:id", authJwt.verifyToken("Admin"), async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: true, message: "User not found" });
+    }
+
+    // Prevent deleting the last admin user
+    if (user.role === 'Admin') {
+      const adminCount = await User.count({ where: { role: 'Admin' } });
+      if (adminCount <= 1) {
+        return res.status(400).json({ 
+          error: true, 
+          message: "Cannot delete the last admin user" 
+        });
+      }
+    }
+
+    await user.destroy();
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: true, message: "Failed to delete user" });
+  }
+});
+
 // ------------------------------ POST API ------------------------------
 
 // Windows Settings API
@@ -876,16 +1003,22 @@ app.post("/api/new-user", authJwt.verifyToken("Admin"), async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    const newUser = await User.create({
       email,
       password: hashedPassword,
       role,
       refresh_token,
     });
 
+    // Return user without password
+    const userResponse = await User.findByPk(newUser.user_id, {
+      attributes: ['user_id', 'email', 'role']
+    });
+
     res.status(201).json({
       error: false,
       message: "User created successfully",
+      user: userResponse
     });
   } catch (error) {
     console.error("Error creating user:", error);
