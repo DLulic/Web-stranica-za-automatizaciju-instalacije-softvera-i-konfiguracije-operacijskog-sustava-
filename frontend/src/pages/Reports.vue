@@ -303,6 +303,7 @@ export default {
       showDetailsDialog: false,
       selectedReport: null,
       reports: [],
+      reports_all: [],
       stats: {
         success: 0,
         failure: 0,
@@ -323,7 +324,7 @@ export default {
         { label: 'Uninstall Programs', value: 'brisanje programa' }
       ],
       pagination: {
-        rowsPerPage: 15,
+        rowsPerPage: 5,
         sortBy: "report_timestamp",
         descending: true,
         rowsNumber: 0,
@@ -490,7 +491,7 @@ export default {
 
       this.loading = true;
       try {
-        const response = await axios.get(`reports`, {
+        const response = await axios.get(`/reports`, {
           headers: this.headers,
           params: {
             page: this.pagination.page,
@@ -502,6 +503,15 @@ export default {
         });
         this.reports = response.data;
         this.pagination.rowsNumber = response.data.total;
+
+        const response_all = await axios.get(`/reports-all`, {
+          headers: this.headers,
+          params: {
+            sortBy: this.pagination.sortBy,
+            descending: this.pagination.descending,
+          },
+        });
+        this.reports_all = response_all.data;
         
         // Calculate statistics
         this.calculateStats();
@@ -603,6 +613,7 @@ export default {
 
     exportReports() {
       const doc = new jsPDF();
+
       const columns = [
         { header: 'ID', dataKey: 'report_id' },
         { header: 'Computer', dataKey: 'report_computer_name' },
@@ -611,7 +622,7 @@ export default {
         { header: 'Status', dataKey: 'report_status' },
         { header: 'Timestamp', dataKey: 'report_timestamp' }
       ];
-      const rows = this.filteredReports.map(report => ({
+      const rows = this.reports_all.map(report => ({
         report_id: report.report_id,
         report_computer_name: report.report_computer_name,
         report_task_type: report.report_task_type,
