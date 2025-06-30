@@ -268,4 +268,133 @@
   justify-content: center;
   height: 100%;
   padding: 7px 0 7px 0;
+}
+
+/* ===========================================
+   LOGIN PAGE STYLES (Login.vue)
+   =========================================== */
+
+/* Light mode background for login page */
+.q-page.login-page-bg {
+  background: linear-gradient(to bottom, #ffffff, #DBECF4);
+}
+
+/* Dark mode background for login page */
+.body--dark .q-page.login-page-bg {
+  background: linear-gradient(to bottom, #23272e, #1a1d22);
+}
+
+/* Login card adjustments */
+.q-card.login-card {
+  background: #fff;
+  color: #194569;
+}
+.body--dark .q-card.login-card {
+  background: #23272e;
+  color: #e0e6ed;
+}
+
+/* Login card section header */
+.q-card-section.color-login {
+  background: #194569;
+}
+.body--dark .q-card-section.color-login {
+  background: #0d253a;
+}
+
+/* Login button in dark mode */
+.body--dark .prijava-gumb {
+  background: #194569 !important;
+  color: #fff !important;
+}
+
+/* Login page link color */
+.q-card-section .login-link {
+  color: #0d47a1;
+}
+.body--dark .q-card-section .login-link {
+  color: #90caf9;
+}
+
+/* ===========================================
+   CUSTOM LOGOUT DIALOG STYLES
+   =========================================== */
+
+.custom-logout-dialog {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.body--dark .custom-logout-dialog {
+  background: #2a3038;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.custom-logout-dialog .header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 8px 8px 16px;
+}
+
+.custom-logout-dialog .header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.custom-logout-dialog .warning-icon {
+  font-size: 24px;
+}
+
+.custom-logout-dialog .confirmation-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.body--dark .custom-logout-dialog .confirmation-text {
+  color: #e0e6ed;
+}
+
+.custom-logout-dialog .dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px 16px;
+  gap: 8px;
+}
+
+.custom-logout-dialog .cancel-btn,
+.custom-logout-dialog .delete-btn {
+  text-transform: none;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 6px 16px;
+}
+
+.custom-logout-dialog .cancel-btn {
+  color: #6c757d;
+}
+
+.body--dark .custom-logout-dialog .cancel-btn {
+  color: #9fadbd;
+}
+
+.custom-logout-dialog .delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.body--dark .custom-logout-dialog .delete-btn {
+  background-color: #c82333;
+}
+
+/* Make active navigation item captions white for better contrast */
+.q-item--active .q-item__label--caption {
+  color: white;
+  opacity: 0.9;
 } 
