@@ -1,15 +1,15 @@
 <template>
   <q-layout view="lHh Lpr fff">
     <q-page
-      class="window-height window-width row justify-center items-center"
-      style="background: linear-gradient(to bottom, #ffffff, #DBECF4); overflow: hidden"
+      class="window-height window-width row justify-center items-center login-page-bg"
+      style="overflow: hidden"
     >
       <div
         class="column q-pa-lg"
         style="max-width: 500px; width: 100%; display: flex; justify-content: center; align-items: center; transform: translateY(-5vh)"
       >
         <div class="row">
-          <q-card square class="shadow-24" style="width: 500px; height: auto;">
+          <q-card style="width: 500px; height: auto;">
             <q-card-section class="color-login">
               <h4 class="text-h5 text-white q-my-md text-center">Prijava</h4>
             </q-card-section>
@@ -70,7 +70,8 @@
                 <span class="text-body2" style="color: #194569;">Zaboravljena lozinka? </span>
                 <a 
                   href="mailto:helpdesk@veleri.hr"
-                  style="color: #0d47a1; font-weight: bold; text-decoration: none;"
+                  class="login-link"
+                  style="font-weight: bold; text-decoration: none;"
                 >
                   Kontaktiraj nas
                 </a>
