@@ -80,6 +80,15 @@
               </div>
               <div class="col-12 col-sm-6 col-md-3">
                 <q-btn 
+                  color="negative" 
+                  icon="delete_forever" 
+                  label="Uninstall Programs"
+                  class="full-width"
+                  @click="$router.push('/uninstall-programs')"
+                />
+              </div>
+              <div class="col-12 col-sm-6 col-md-3">
+                <q-btn 
                   color="accent" 
                   icon="download" 
                   label="Install Programs"
@@ -133,7 +142,7 @@
               :columns="reportColumns"
               row-key="report_id"
               v-model:pagination="pagination"
-              :rows-per-page-options="[5, 10, 20, 25, 50]" 
+              :rows-per-page-options="[5, 10, 20, 25, 50, 0]" 
               @request="onRequest"
               flat
             >
@@ -177,12 +186,12 @@
                 <span class="q-ml-sm">API Server: {{ systemStatus.server }}</span>
               </div>
               <div class="row items-center">
-                <q-icon name="schedule" color="info" size="sm" />
-                <span class="q-ml-sm">Last Update: {{ systemStatus.timestamp ? formatTime(systemStatus.timestamp) : 'N/A' }}</span>
+                <q-icon name="timer" color="primary" size="sm" />
+                <span class="q-ml-sm">API Uptime: {{ formatUptime(systemStatus.uptime) }}</span>
               </div>
               <div class="row items-center">
-                <q-icon name="timer" color="primary" size="sm" />
-                <span class="q-ml-sm">Uptime: {{ formatUptime(systemStatus.uptime) }}</span>
+                <q-icon name="schedule" color="info" size="sm" />
+                <span class="q-ml-sm">Last Update: {{ systemStatus.timestamp ? formatTime(systemStatus.timestamp) : 'N/A' }}</span>
               </div>
             </div>
           </q-card-section>
