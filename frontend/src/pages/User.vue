@@ -75,16 +75,6 @@
           clearable
         />
       </div>
-      
-      <div class="col-12 col-md-2">
-        <q-btn
-          color="primary"
-          icon="filter_list"
-          label="Apply"
-          class="full-width"
-          @click="applyFilters"
-        />
-      </div>
     </div>
 
     <!-- Users Table -->
@@ -689,15 +679,6 @@ export default {
         role: null
       };
     },
-
-    applyFilters() {
-      this.$q.notify({
-        color: "info",
-        position: "top",
-        message: "Filtri primijenjeni",
-        icon: "filter_list",
-      });
-    }
   }
 };
 </script> 
