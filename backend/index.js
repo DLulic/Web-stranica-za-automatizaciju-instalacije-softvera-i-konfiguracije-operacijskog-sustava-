@@ -302,8 +302,37 @@ app.get("/api/python-packages/:id", authJwt.verifyToken("Admin"), async (req, re
 // Uninstall Programs API
 app.get("/api/uninstall-programs", authJwt.verifyToken("Admin"), async (req, res) => {
   try {
-    const programs = await UninstallPrograms.findAll();
-    res.status(200).json(programs);
+    const page = parseInt(req.query.page) || 1;
+    const limit = req.query.limit !== undefined ? parseInt(req.query.limit) : 10;
+    const { sortBy, descending, search } = req.query;
+
+    const findOptions = {
+      order: [[sortBy || 'uninstall_name', descending === 'true' ? 'DESC' : 'ASC']]
+    };
+
+    const where = {};
+    if (search) {
+      where[Op.or] = [
+        { uninstall_name: { [Op.like]: `%${search}%` } },
+        { uninstall_name_program: { [Op.like]: `%${search}%` } }
+      ];
+    }
+    findOptions.where = where;
+
+    const totalPrograms = await UninstallPrograms.count({ where });
+
+    if (limit > 0) {
+      const offset = (page - 1) * limit;
+      findOptions.limit = limit;
+      findOptions.offset = offset;
+    }
+
+    const programs = await UninstallPrograms.findAll(findOptions);
+
+    res.status(200).json({
+      items: programs,
+      total: totalPrograms
+    });
   } catch (error) {
     console.error("Error fetching uninstall programs:", error);
     res.status(500).json({ error: true, message: "Failed to fetch uninstall programs" });
@@ -360,6 +389,19 @@ app.get("/api/reports", authJwt.verifyToken("Admin"), async (req, res) => {
     const reports = await Report.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset),
+      order: [['report_timestamp', 'DESC']]
+    });
+    res.status(200).json(reports);
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    res.status(500).json({ error: true, message: "Failed to fetch reports" });
+  }
+});
+
+// Reports API
+app.get("/api/reports-all", authJwt.verifyToken("Admin"), async (req, res) => {
+  try {
+    const reports = await Report.findAll({
       order: [['report_timestamp', 'DESC']]
     });
     res.status(200).json(reports);

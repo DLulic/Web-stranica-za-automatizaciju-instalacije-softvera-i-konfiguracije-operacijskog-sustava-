@@ -15,7 +15,8 @@ const routes = [
       { path: 'group-policy', component: () => import('src/pages/Policies.vue'), meta: { requiresLogIn: true } },
       { path: 'python-dependencies', component: () => import('src/pages/PythonPackages.vue'), meta: { requiresLogIn: true } },
       { path: 'users', component: () => import('src/pages/User.vue'), meta: { requiresLogIn: true } },
-
+      { path: '/uninstall-programs', component: () => import('pages/UninstallPrograms.vue')
+      },
     ]
   },
 
