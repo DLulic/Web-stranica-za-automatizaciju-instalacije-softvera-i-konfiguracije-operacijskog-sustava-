@@ -15,7 +15,7 @@
           <q-card-section class="text-center">
             <q-icon name="computer" size="3rem" color="primary" />
             <div class="text-h6 q-mt-sm">{{ stats.totalComputers }}</div>
-            <div class="text-caption text-grey-6">Active Systems</div>
+            <div class="text-caption text-grey-6">PC Systems</div>
           </q-card-section>
         </q-card>
       </div>
@@ -36,16 +36,6 @@
             <q-icon name="error" size="3rem" color="negative" />
             <div class="text-h6 q-mt-sm">{{ stats.failedTasks }}</div>
             <div class="text-caption text-grey-6">Failed Tasks</div>
-          </q-card-section>
-        </q-card>
-      </div>
-      
-      <div class="col-12 col-sm-6 col-md-3">
-        <q-card class="status-card">
-          <q-card-section class="text-center">
-            <q-icon name="pending" size="3rem" color="warning" />
-            <div class="text-h6 q-mt-sm">{{ stats.pendingTasks }}</div>
-            <div class="text-caption text-grey-6">Pending Tasks</div>
           </q-card-section>
         </q-card>
       </div>
@@ -142,7 +132,7 @@
               :columns="reportColumns"
               row-key="report_id"
               v-model:pagination="pagination"
-              :rows-per-page-options="[5, 10, 20, 25, 50, 0]" 
+              :rows-per-page-options="[5, 10, 20, 25, 50]" 
               @request="onRequest"
               flat
             >
@@ -213,6 +203,7 @@ export default {
   data() {
     return {
       headers: null,
+      refreshInterval: null,
       stats: {
         totalComputers: 0,
         successfulTasks: 0,
@@ -295,6 +286,7 @@ export default {
         // Set up the request headers to include the JWT token
         this.headers = { Authorization: `Bearer ${token}` };
         this.loadDashboardData();
+        this.refreshInterval = setInterval(this.loadDashboardData, 300000); // Refresh every 5 minutes
       }
     } else {
       this.$router.push('/prijava');
@@ -413,6 +405,11 @@ export default {
       const minutes = Math.floor((uptime % 3600) / 60);
       const seconds = Math.floor(uptime % 60);
       return `${hours}h ${minutes}m ${seconds}s`;
+    }
+  },
+  beforeUnmount() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
     }
   }
 };
