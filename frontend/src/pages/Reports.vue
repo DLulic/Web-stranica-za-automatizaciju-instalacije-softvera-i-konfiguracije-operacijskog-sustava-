@@ -193,7 +193,7 @@
     </q-card>
 
     <!-- Report Details Dialog -->
-    <q-dialog v-model="showDetailsDialog">
+    <q-dialog v-model="showDetailsDialog" @keyup.esc="showDetailsDialog = false">
       <q-card style="min-width: 500px">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">Report Details</div>

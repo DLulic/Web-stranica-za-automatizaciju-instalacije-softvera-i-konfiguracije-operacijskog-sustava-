@@ -52,7 +52,6 @@
             { label: 'Disabled', value: false }
           ]"
           color="primary"
-          class="full-width"
         />
       </div>
     </div>
@@ -133,7 +132,7 @@
     </q-card>
 
     <!-- Add/Edit Dialog -->
-    <q-dialog v-model="showAddDialog" persistent>
+    <q-dialog v-model="showAddDialog" @keyup.esc="showAddDialog = false">
       <q-card style="min-width: 700px">
         <q-card-section>
           <div class="text-h6">{{ editingPolicy ? 'Edit Policy' : 'Add New Policy' }}</div>
@@ -206,7 +205,7 @@
     </q-dialog>
 
     <!-- Policy Details Dialog -->
-    <q-dialog v-model="showDetailsDialog">
+    <q-dialog v-model="showDetailsDialog" @keyup.esc="showDetailsDialog = false">
       <q-card style="min-width: 600px">
         <q-card-section>
           <div class="text-h6">Policy Details</div>
@@ -298,7 +297,7 @@
     </q-dialog>
 
     <!-- Delete Confirmation -->
-    <q-dialog v-model="showDeleteDialog">
+    <q-dialog v-model="showDeleteDialog" @keyup.esc="showDeleteDialog = false">
       <q-card>
         <q-card-section>
           <div class="text-h6">Confirm Delete</div>

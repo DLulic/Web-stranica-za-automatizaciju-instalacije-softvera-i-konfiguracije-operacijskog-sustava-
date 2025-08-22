@@ -149,7 +149,7 @@
     <!-- Main Content -->
     <q-page-container :class="$q.dark.isActive ? 'bg-dark' : 'bg-grey-1'">
       <!-- Custom Logout Confirmation Dialog -->
-      <q-dialog v-model="confirmLogoutDialog" persistent>
+      <q-dialog v-model="confirmLogoutDialog" @keyup.esc="confirmLogoutDialog = false">
         <q-card class="custom-logout-dialog">
           <q-card-section class="header-section">
             <div class="header-content">
@@ -173,7 +173,7 @@
       <q-toolbar>
         <q-toolbar-title>
           <div class="text-caption">
-            © 2024 Automation System. All rights reserved.
+            © 2025 Veleučilište u Rijeci || Dorian Lulić || All rights reserved.
           </div>
         </q-toolbar-title>
         <div class="text-caption">

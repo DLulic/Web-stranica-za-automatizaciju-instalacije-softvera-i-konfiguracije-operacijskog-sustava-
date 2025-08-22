@@ -123,7 +123,7 @@
     </q-card>
 
     <!-- Add/Edit Dialog -->
-    <q-dialog v-model="showAddDialog" persistent>
+    <q-dialog v-model="showAddDialog" @keyup.esc="showAddDialog = false">
       <q-card style="min-width: 500px">
         <q-card-section>
           <div class="text-h6">{{ editingDependency ? 'Edit Dependency' : 'Add New Dependency' }}</div>
@@ -159,7 +159,7 @@
     </q-dialog>
 
     <!-- Dependency Details Dialog -->
-    <q-dialog v-model="showDetailsDialog">
+    <q-dialog v-model="showDetailsDialog" @keyup.esc="showDetailsDialog = false">
       <q-card style="min-width: 500px">
         <q-card-section>
           <div class="text-h6">Dependency Details</div>
@@ -197,7 +197,7 @@
     </q-dialog>
 
     <!-- Delete Confirmation -->
-    <q-dialog v-model="showDeleteDialog">
+    <q-dialog v-model="showDeleteDialog" @keyup.esc="showDeleteDialog = false">
       <q-card>
         <q-card-section>
           <div class="text-h6">Confirm Delete</div>

@@ -77,7 +77,7 @@
     </q-card>
 
     <!-- Add/Edit Dialog -->
-    <q-dialog v-model="showAddDialog" persistent>
+    <q-dialog v-model="showAddDialog" @keyup.esc="showAddDialog = false">
       <q-card style="min-width: 500px">
         <q-card-section>
           <div class="text-h6">{{ editingProgram ? 'Edit Program' : 'Add New Uninstall Program' }}</div>
@@ -114,7 +114,7 @@
     </q-dialog>
 
     <!-- Delete Confirmation -->
-    <q-dialog v-model="showDeleteDialog">
+    <q-dialog v-model="showDeleteDialog" @keyup.esc="showDeleteDialog = false">
       <q-card>
         <q-card-section>
           <div class="text-h6">Confirm Delete</div>

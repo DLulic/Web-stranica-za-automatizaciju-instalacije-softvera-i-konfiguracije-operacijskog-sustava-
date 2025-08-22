@@ -144,7 +144,7 @@
     </q-card>
 
     <!-- Add User Dialog -->
-    <q-dialog v-model="showAddUserDialog" persistent>
+    <q-dialog v-model="showAddUserDialog" @keyup.esc="showAddUserDialog = false">
       <q-card style="min-width: 400px">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">Add New User</div>
@@ -214,7 +214,7 @@
     </q-dialog>
 
     <!-- Edit User Dialog -->
-    <q-dialog v-model="showEditUserDialog" persistent>
+    <q-dialog v-model="showEditUserDialog" @keyup.esc="showEditUserDialog = false">
       <q-card style="min-width: 400px">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">Edit User</div>
@@ -272,7 +272,7 @@
     </q-dialog>
 
     <!-- User Details Dialog -->
-    <q-dialog v-model="showDetailsDialog">
+    <q-dialog v-model="showDetailsDialog" @keyup.esc="showDetailsDialog = false">
       <q-card style="min-width: 500px">
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">User Details</div>
@@ -317,7 +317,7 @@
     </q-dialog>
 
     <!-- Delete User Dialog -->
-    <q-dialog v-model="showDeleteDialog">
+    <q-dialog v-model="showDeleteDialog" @keyup.esc="showDeleteDialog = false">
       <q-card>
         <q-card-section>
           <div class="text-h6">Confirm Delete</div>
