@@ -14,7 +14,7 @@
           color="white"
           text-color="blue"
           unelevated
-          to="/"
+          @click="$router.push('prijava')"
           label="Go Home"
           no-caps
         />
